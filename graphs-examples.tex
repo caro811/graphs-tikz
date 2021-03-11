@@ -14,7 +14,7 @@ Graphs for tikz. Examples.
 
 \begin{center}
 \begin{tikzpicture}
-	\fatSpider{0}{0}{1}{5}{f};
+	\thickSpider{0}{0}{1}{5}{f};
 
 	\thinSpider{5}{0}{1}{8}{f};
 \end{tikzpicture}
@@ -71,7 +71,7 @@ Graphs for tikz. Examples.
 	\vertexLabelledInside[fill=blue!20]{2}{1.75}{v4}{$v_4$};
 	\vertexLabelledInside{2}{0.75}{v5}{$v_5$};
 
-	\edge[color=red]{v1}{v2};
+	\edge[color=red, line width=4pt]{v1}{v2};
 	\edge[line width=3pt]{v2}{v3};
 	\edge[dashed]{v3}{v4};
 	\edgeCurved{v4}{v5}{0}{0};
