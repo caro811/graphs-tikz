@@ -38,19 +38,19 @@
 
 % \vertex[(optional) color]{x}{y}{name}
 \newcommand{\vertex}[4][black]{
-    \draw[#1, fill=#1, inner sep=0pt] (#2, #3) circle (0.075) node(#4){};
+    \path (#2,#3) node[#1, fill=#1, circle, minimum size=0.16cm, inner sep=0pt, outer sep=0pt](#4){};
 }
 
 % Vertex (unlabelled) of medium size
 % \vertexMedium[optional arguments (for example, color, pattern)]{x}{y}{name}
 \newcommand{\vertexMedium}[4][]{
-	\path (#2,#3) node[draw, circle, #1, minimum width=15pt](#4){};
+	\path (#2,#3) node[draw, circle, #1, minimum width=15pt, inner sep=0pt, outer sep=0pt](#4){};
 }
 
 % With label inside
 % \vertexLabelledInside[optional arguments (for example, color, pattern)]{x}{y}{name}{label}
 \newcommand{\vertexLabelledInside}[5][]{
-	\path (#2,#3) node[draw, circle, #1, minimum width=25pt](#4){#5};
+	\path (#2,#3) node[draw, circle, #1, minimum width=25pt, inner sep=0pt, outer sep=0pt](#4){#5};
 }
 
 % Only label, outside
@@ -190,41 +190,41 @@
 	}
 }
 
-% Fat spider
-% \fatSpider[(optional) color]{x of center}{y of center}{scale}{n}{name}
-\newcommand{\fatSpider}[6][]{
-	\foreach \fatSpiderI in {1,...,#5} {
+% Thick spider
+% \thickSpider[(optional) color]{x of center}{y of center}{scale}{n}{name}
+\newcommand{\thickSpider}[6][]{
+	\foreach \thickSpiderI in {1,...,#5} {
 		\vertexRegularPolygon[#1]
 						{#2}{#3}
 						{#4}
 						{#5}
-						{\fatSpiderI}
-						{#6c\fatSpiderI}
+						{\thickSpiderI}
+						{#6c\thickSpiderI}
 						{};
 
 		\vertexRegularPolygon[#1]
 						{#2}{#3}
 						{2*(#4)}
 						{#5}
-						{\fatSpiderI}
-						{#6s\fatSpiderI}
+						{\thickSpiderI}
+						{#6s\thickSpiderI}
 						{};
 	}
 
-	\foreach \fatSpiderI in {2,...,#5} {
-		\pgfmathtruncatemacro{\fatSpiderIminusOne}{\fatSpiderI - 1};
+	\foreach \thickSpiderI in {2,...,#5} {
+		\pgfmathtruncatemacro{\thickSpiderIminusOne}{\thickSpiderI - 1};
 
-		\foreach \fatSpiderJ in {1,...,\fatSpiderIminusOne} {
-			\edge[#1]{#6c\fatSpiderI}{#6c\fatSpiderJ};
+		\foreach \thickSpiderJ in {1,...,\thickSpiderIminusOne} {
+			\edge[#1]{#6c\thickSpiderI}{#6c\thickSpiderJ};
 		}
 	}
 
-	\foreach \fatSpiderI in {1,...,#5} {
-		\foreach \fatSpiderJ in {1,...,#5} {
+	\foreach \thickSpiderI in {1,...,#5} {
+		\foreach \thickSpiderJ in {1,...,#5} {
 			\ifthenelse
-			{\equal{\fatSpiderI}{\fatSpiderJ}}
+			{\equal{\thickSpiderI}{\thickSpiderJ}}
 			{}
-			{\edge[#1]{#6s\fatSpiderI}{#6c\fatSpiderJ};};
+			{\edge[#1]{#6s\thickSpiderI}{#6c\thickSpiderJ};};
 		}
 	}
 }
