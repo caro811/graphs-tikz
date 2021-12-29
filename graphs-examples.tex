@@ -4,6 +4,8 @@
 
 \usepackage{graphs-tikz}
 
+\pagestyle{empty}
+
 %------------------------------------------------------------------------------------------------------------------------------------
 %------------------------------------------------------------------------------------------------------------------------------------
 \begin{document}
@@ -24,9 +26,9 @@ Graphs for tikz. Examples.
 
 \begin{center}
 \begin{tikzpicture}
-	\cycle[size=medium, color=red, fill=red!20]{0}{0}{1.25}{6}{c};
+	\cycle[size=0.6cm, color=red, fill=red!20]{0}{0}{1.25}{6}{c};
 
-	\complete{5}{0}{1.25}{6}{k};
+	\complete[size=0.3cm]{5}{0}{1.25}{6}{k};
 \end{tikzpicture}
 \end{center}
 
@@ -34,7 +36,7 @@ Graphs for tikz. Examples.
 
 \begin{center}
 \begin{tikzpicture}
-	\vertex[green]{0}{0}{v};
+	\vertex[color=green, fill=green]{0}{0}{v};
 
 	\vertexLabel[above]{v}{N};
 	\vertexLabel[green, above right]{v}{NE};

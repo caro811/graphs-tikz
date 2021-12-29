@@ -25,8 +25,6 @@
 %--------------------------------------------------------------------------------------------------------------------------------------------------
 % Options passed to the package
 
-%\DeclareOption{blue}{\renewcommand{\wordcolour}{mybluecolour}}
-
 \DeclareOption*{\PackageWarning{graphs-tikz}{Unknown ‘\CurrentOption’}}
 
 \ProcessOptions\relax
@@ -61,7 +59,7 @@
 
 %----------------------------------
 % Vertex
-% \vertex[(optional) color]{x}{y}{name}
+% \vertex[optional arguments (color, size, etc.)]{x}{y}{name}
 \newcommand{\vertex}[4][]{
 	\pgfqkeys{/vertex}{remainingkeys/.style={}}
 	\pgfkeys{/vertex, default, #1}
@@ -69,10 +67,10 @@
 	\IfEqCase{\vertexSize}{
 		{small}{\def\vertexDiameter{0.16cm}}
 		{medium}{\def\vertexDiameter{0.52cm}}
-		{big}{\def\vertexDiameter{0.878cm}}
-	}[\PackageError{vertex}{Undefined option to vertex: size=\vertexSize}{}]
+		{big}{\def\vertexDiameter{0.878cm}}%
+	}[\def\vertexDiameter{\vertexSize}]
 
-	\path (#2,#3) node[draw=\vertexColor, circle, /vertex/remainingkeys, minimum size=\vertexDiameter, inner sep=0pt, outer sep=0pt](#4){};
+	\path (#2,#3) node[draw=\vertexColor, circle, minimum size=\vertexDiameter, /vertex/remainingkeys, inner sep=0pt, outer sep=0pt](#4){};
 }
 
 %----------------------------------
@@ -89,14 +87,14 @@
 
 %----------------------------------
 % Straight
-% \edge[optional parameters (such as "color=red, dashed")]{nameVertex1}{nameVertex2}
+% \edge[optional arguments (such as "color=red, dashed")]{nameVertex1}{nameVertex2}
 \newcommand{\edge}[3][]{
 	\draw[#1] (#2) -- (#3);
 }
 
 %----------------------------------
 % Curved
-% \edgeCurved[optional parameters (such as "color=red, dashed")]{nameVertex1}{nameVertex2}{angleOut}{angleIn}
+% \edgeCurved[optional arguments (such as "color=red, dashed")]{nameVertex1}{nameVertex2}{angleOut}{angleIn}
 \newcommand{\edgeCurved}[5][]{
 	\draw[#1] (#2) to[out=#4, in=#5] (#3);
 }
@@ -111,7 +109,7 @@
 
 %---------------------------------------------------------------------------------------------------
 % Join
-% \join[optional parameters (such as "color=red, dashed")]{name graph 1}{n1}{name graph 2}{n2}
+% \join[optional arguments (such as "color=red, dashed")]{name graph 1}{n1}{name graph 2}{n2}
 \newcommand{\join}[5][]{
 	\foreach \joinI in {1,...,#3} {
 		\foreach \joinJ in {1,...,#5} {
@@ -186,11 +184,11 @@
 %---------------------------------------------------------------------------------------------------
 
 %---------------------------------------------------------------------------------------------------
-% Spiders with no head (H = \emptyset)
+% Spiders
 
 %----------------------------------
 % Thin spider
-% \thinSpider[(optional) color]{x of center}{y of center}{scale}{n}{name}
+% \thinSpider[optional arguments]{x of center}{y of center}{scale}{n}{name}
 \newcommand{\thinSpider}[6][]{
 	\pgfkeys{/vertex, default, #1}
 
@@ -225,7 +223,7 @@
 
 %----------------------------------
 % Thick spider
-% \thickSpider[(optional) color]{x of center}{y of center}{scale}{n}{name}
+% \thickSpider[optional arguments]{x of center}{y of center}{scale}{n}{name}
 \newcommand{\thickSpider}[6][]{
 	\pgfkeys{/vertex, default, #1}
 
