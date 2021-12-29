@@ -12,7 +12,9 @@
 %--------------------------------------------------------------------------------------------------------------------------------------------------
 % Required packages
 
-%\RequirePackage{ifthen}
+\RequirePackage{pgfkeys}
+
+\RequirePackage{xstring}
 
 \RequirePackage{rotating}
 
@@ -33,17 +35,238 @@
 %--------------------------------------------------------------------------------------------------------------------------------------------------
 % Body
 
+%----------------------------------
+% Auxiliary
+\pgfkeys{
+	/vertex/.is family, /vertex,
+	default/.style = {
+		size = small,
+		color = black
+	},
+	size/.estore in = \vertexSize,
+	color/.estore in = \vertexColor,
+	.unknown/.code={
+		\let\currname\pgfkeyscurrentname
+		\let\currval\pgfkeyscurrentvalue
+		\ifx#1\pgfkeysnovalue
+			\pgfqkeys{/vertex}{remainingkeys/.append style/.expand once={\currname}}
+		\else
+			\pgfqkeys{/vertex}{remainingkeys/.append style/.expand twice={\expandafter\currname\expandafter=\currval}}
+		\fi
+	}
+}
+
 %---------------------------------------------------------------------------------------------------
 % Vertices
 
+%----------------------------------
+% Vertex
 % \vertex[(optional) color]{x}{y}{name}
-\newcommand{\vertex}[4][black]{
-    \path (#2,#3) node[#1, fill=#1, circle, minimum size=0.16cm, inner sep=0pt, outer sep=0pt](#4){};
+\newcommand{\vertex}[4][]{
+	\pgfqkeys{/vertex}{remainingkeys/.style={}}
+	\pgfkeys{/vertex, default, #1}
+
+	\IfEqCase{\vertexSize}{
+		{small}{\def\vertexDiameter{0.16cm}}
+		{medium}{\def\vertexDiameter{0.52cm}}
+		{big}{\def\vertexDiameter{0.878cm}}
+	}[\PackageError{vertex}{Undefined option to vertex: size=\vertexSize}{}]
+
+	\path (#2,#3) node[draw=\vertexColor, circle, /vertex/remainingkeys, minimum size=\vertexDiameter, inner sep=0pt, outer sep=0pt](#4){};
 }
 
-% Vertex (unlabelled) of medium size
-% \vertexMedium[optional arguments (for example, color, pattern)]{x}{y}{name}
-\newcommand{\vertexMedium}[4][]{
+%----------------------------------
+% Vertex label
+% \vertexLabel[(optional) position]{name}{label}
+% position: below, above, left, right, and combinations (below left, etc.)
+\newcommand{\vertexLabel}[3][anchor=center]{
+    \path (#2) node[#1]{#3};
+}
+%---------------------------------------------------------------------------------------------------
+
+%---------------------------------------------------------------------------------------------------
+% Edges
+
+%----------------------------------
+% Straight
+% \edge[optional parameters (such as "color=red, dashed")]{nameVertex1}{nameVertex2}
+\newcommand{\edge}[3][]{
+	\draw[#1] (#2) -- (#3);
+}
+
+%----------------------------------
+% Curved
+% \edgeCurved[optional parameters (such as "color=red, dashed")]{nameVertex1}{nameVertex2}{angleOut}{angleIn}
+\newcommand{\edgeCurved}[5][]{
+	\draw[#1] (#2) to[out=#4, in=#5] (#3);
+}
+
+%----------------------------------
+% Edge label
+% \edgeLabel[(optional) position]{nameVertex1}{nameVertex2}{label}
+\newcommand{\edgeLabel}[4][above]{
+	\path (#2) -- (#3) node[midway, #1]{#4};
+}
+%---------------------------------------------------------------------------------------------------
+
+%---------------------------------------------------------------------------------------------------
+% Join
+% \join[optional parameters (such as "color=red, dashed")]{name graph 1}{n1}{name graph 2}{n2}
+\newcommand{\join}[5][]{
+	\foreach \joinI in {1,...,#3} {
+		\foreach \joinJ in {1,...,#5} {
+			\edge[#1]{#2\joinI}{#4\joinJ};
+		}
+	}
+}
+%---------------------------------------------------------------------------------------------------
+
+%---------------------------------------------------------------------------------------------------
+% Vertex of a regular polygon
+% \vertexRegularPolygon[optional arguments]{x of center}{y of center}{scale}{n}{position of vertex}{name}
+\newcommand{\vertexRegularPolygon}[7][]{
+	\vertex[#1]
+	{ { (#2) + (#4) * -cos(deg(6.283*(#6 - 1)/(#5)-(1.571+3.142/(#5)))) } }
+	{ { (#3) + (#4) * sin(deg(6.283*(#6 - 1)/(#5)-(1.571+3.142/(#5)))) } }
+	{#7};
+}
+%---------------------------------------------------------------------------------------------------
+
+%---------------------------------------------------------------------------------------------------
+% Cycle
+% \cycle[optional arguments]{x of center}{y of center}{scale}{n}{name}
+\newcommand{\cycle}[6][]{
+	\pgfkeys{/vertex, default, #1}
+
+	\foreach \cycleI in {1,...,#5} {
+		\vertexRegularPolygon[#1]
+						{#2}{#3}
+						{#4}
+						{#5}
+						{\cycleI}
+						{#6\cycleI}
+						{};
+	}
+
+	\foreach \cycleI in {2,...,#5} {
+		\pgfmathtruncatemacro{\cycleIminusOne}{\cycleI - 1};
+
+		\edge[\vertexColor]{#6\cycleI}{#6\cycleIminusOne};
+	}
+	\pgfmathtruncatemacro{\cycleN}{#5};
+	\pgfmathtruncatemacro{\cycleOne}{1};
+	\edge[\vertexColor]{#6\cycleN}{#6\cycleOne};
+}
+%---------------------------------------------------------------------------------------------------
+
+%---------------------------------------------------------------------------------------------------
+% Complete
+% \complete[optional arguments]{x of center}{y of center}{scale}{n}{name}
+\newcommand{\complete}[6][]{
+	\pgfkeys{/vertex, default, #1}
+
+	\foreach \completeI in {1,...,#5} {
+		\vertexRegularPolygon[#1]
+						{#2}{#3}
+						{#4}
+						{#5}
+						{\completeI}
+						{#6\completeI}
+						{};
+	}
+
+	\foreach \completeI in {2,...,#5} {
+		\pgfmathtruncatemacro{\completeIminusOne}{\completeI - 1};
+
+		\foreach \completeJ in {1,...,\completeIminusOne} {
+			\edge[\vertexColor]{#6\completeI}{#6\completeJ};
+		}
+	}
+}
+%---------------------------------------------------------------------------------------------------
+
+%---------------------------------------------------------------------------------------------------
+% Spiders with no head (H = \emptyset)
+
+%----------------------------------
+% Thin spider
+% \thinSpider[(optional) color]{x of center}{y of center}{scale}{n}{name}
+\newcommand{\thinSpider}[6][]{
+	\pgfkeys{/vertex, default, #1}
+
+	\foreach \thinSpiderI in {1,...,#5} {
+		\vertexRegularPolygon[#1]
+						{#2}{#3}
+						{#4}
+						{#5}
+						{\thinSpiderI}
+						{#6c\thinSpiderI}
+						{};
+
+		\vertexRegularPolygon[#1]
+						{#2}{#3}
+						{2*(#4)}
+						{#5}
+						{\thinSpiderI}
+						{#6s\thinSpiderI}
+						{};
+
+		\edge[\vertexColor]{#6c\thinSpiderI}{#6s\thinSpiderI};
+	}
+
+	\foreach \thinSpiderI in {2,...,#5} {
+		\pgfmathtruncatemacro{\thinSpiderIminusOne}{\thinSpiderI - 1};
+
+		\foreach \thinSpiderJ in {1,...,\thinSpiderIminusOne} {
+			\edge[\vertexColor]{#6c\thinSpiderI}{#6c\thinSpiderJ};
+		}
+	}
+}
+
+%----------------------------------
+% Thick spider
+% \thickSpider[(optional) color]{x of center}{y of center}{scale}{n}{name}
+\newcommand{\thickSpider}[6][]{
+	\pgfkeys{/vertex, default, #1}
+
+	\foreach \thickSpiderI in {1,...,#5} {
+		\vertexRegularPolygon[#1]
+						{#2}{#3}
+						{#4}
+						{#5}
+						{\thickSpiderI}
+						{#6c\thickSpiderI}
+						{};
+
+		\vertexRegularPolygon[#1]
+						{#2}{#3}
+						{2*(#4)}
+						{#5}
+						{\thickSpiderI}
+						{#6s\thickSpiderI}
+						{};
+	}
+
+	\foreach \thickSpiderI in {2,...,#5} {
+		\pgfmathtruncatemacro{\thickSpiderIminusOne}{\thickSpiderI - 1};
+
+		\foreach \thickSpiderJ in {1,...,\thickSpiderIminusOne} {
+			\edge[\vertexColor]{#6c\thickSpiderI}{#6c\thickSpiderJ};
+		}
+	}
+
+	\foreach \thickSpiderI in {1,...,#5} {
+		\foreach \thickSpiderJ in {1,...,#5} {
+			\ifthenelse
+			{\equal{\thickSpiderI}{\thickSpiderJ}}
+			{}
+			{\edge[\vertexColor]{#6s\thickSpiderI}{#6c\thickSpiderJ};};
+		}
+	}
+}
+%---------------------------------------------------------------------------------------------------
+%--------------------------------------------------------------------------------------------------------------------------------------------------
+
 	\path (#2,#3) node[draw, circle, #1, minimum width=15pt, inner sep=0pt, outer sep=0pt](#4){};
 }
 
