@@ -14,7 +14,7 @@ Graphs for tikz. Examples.
 
 \begin{center}
 \begin{tikzpicture}
-	\thickSpider{0}{0}{1}{5}{f};
+	\thickSpider[fill=black]{0}{0}{1}{5}{f};
 
 	\thinSpider{5}{0}{1}{8}{f};
 \end{tikzpicture}
@@ -24,7 +24,7 @@ Graphs for tikz. Examples.
 
 \begin{center}
 \begin{tikzpicture}
-	\cycle{0}{0}{1.25}{6}{c};
+	\cycle[size=medium, color=red, fill=red!20]{0}{0}{1.25}{6}{c};
 
 	\complete{5}{0}{1.25}{6}{k};
 \end{tikzpicture}
@@ -36,7 +36,7 @@ Graphs for tikz. Examples.
 \begin{tikzpicture}
 	\vertex[green]{0}{0}{v};
 
-	\vertexLabel{v}{N};
+	\vertexLabel[above]{v}{N};
 	\vertexLabel[green, above right]{v}{NE};
 	\vertexLabel[right]{v}{E};
 	\vertexLabel[green, below right]{v}{SE};
@@ -47,7 +47,7 @@ Graphs for tikz. Examples.
 \end{tikzpicture}
 \hspace{50pt}
 \begin{tikzpicture}
-	\complete[blue]{0}{0}{1.5}{7}{K};
+	\complete[color=blue]{0}{0}{1.5}{7}{K};
 
 	\vertexLabel[below, inner sep=7pt]{K1}{$v_1$};
 	\vertexLabel[below, inner sep=7pt]{K2}{$v_2$};
@@ -65,11 +65,16 @@ Graphs for tikz. Examples.
 
 \begin{center}
 \begin{tikzpicture}
-	\vertexLabelledInside{0}{0.75}{v1}{$v_1$};
-	\vertexLabelledInside{0}{1.75}{v2}{$v_2$};
-	\vertexLabelledInside{1}{2.75}{v3}{$v_3$};
-	\vertexLabelledInside[fill=blue!20]{2}{1.75}{v4}{$v_4$};
-	\vertexLabelledInside{2}{0.75}{v5}{$v_5$};
+	\vertex[size=big]{0}{0.75}{v1};
+	\vertexLabel{v1}{$v_1$};
+	\vertex[size=big]{0}{1.75}{v2};
+	\vertexLabel{v2}{$v_2$};
+	\vertex[size=big]{1}{2.75}{v3};
+	\vertexLabel{v3}{$v_3$};
+	\vertex[size=big, fill=blue!20]{2}{1.75}{v4};
+	\vertexLabel{v4}{$v_4$};
+	\vertex[size=big]{2}{0.75}{v5};
+	\vertexLabel{v5}{$v_5$};
 
 	\edge[color=red, line width=4pt]{v1}{v2};
 	\edge[line width=3pt]{v2}{v3};
@@ -92,15 +97,15 @@ Graphs for tikz. Examples.
 \end{tikzpicture}
 \hspace{50pt}
 \begin{tikzpicture}
-	\vertexMedium{0}{0}{g00};
-	\vertexMedium[fill=black!20]{0}{1}{g01};
-	\vertexMedium[fill=gray]{0}{2}{g02};
-	\vertexMedium[pattern=north east lines, pattern color=black]{1}{0}{g10};
-	\vertexMedium[pattern=north west lines, pattern color=black]{1}{1}{g11};
-	\vertexMedium[pattern=dots, pattern color=black]{1}{2}{g12};
-	\vertexMedium[pattern=horizontal lines, pattern color=black]{2}{0}{g20};
-	\vertexMedium[pattern=vertical lines, pattern color=black]{2}{1}{g21};
-	\vertexMedium[pattern=grid, pattern color=black]{2}{2}{g22};
+	\vertex[size=medium]{0}{0}{g00};
+	\vertex[size=medium, fill=black!20]{0}{1}{g01};
+	\vertex[size=medium, fill=gray]{0}{2}{g02};
+	\vertex[size=medium, pattern=north east lines, pattern color=black]{1}{0}{g10};
+	\vertex[size=medium, pattern=north west lines, pattern color=black]{1}{1}{g11};
+	\vertex[size=medium, pattern=dots, pattern color=black]{1}{2}{g12};
+	\vertex[size=medium, pattern=horizontal lines, pattern color=black]{2}{0}{g20};
+	\vertex[size=medium, pattern=vertical lines, pattern color=black]{2}{1}{g21};
+	\vertex[size=medium, pattern=grid, pattern color=black]{2}{2}{g22};
 
 	\edge{g00}{g01};
 	\edge{g00}{g10};
