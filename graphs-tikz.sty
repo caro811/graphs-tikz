@@ -6,7 +6,7 @@
 
 \NeedsTeXFormat{LaTeX2e}
 
-\ProvidesPackage{graphs-tikz}[2021/03/11 graphs-tikz package]
+\ProvidesPackage{graphs-tikz}[2023/03/07 graphs-tikz package]
 %--------------------------------------------------------------------------------------------------------------------------------------------------
 
 %--------------------------------------------------------------------------------------------------------------------------------------------------
@@ -37,7 +37,7 @@
 % Auxiliary
 \pgfkeys{
 	/vertex/.is family, /vertex,
-	default/.style = {
+	defaultVertex/.style = {
 		size = small,
 		color = black
 	},
@@ -54,6 +54,30 @@
 	}
 }
 
+%----------------------------------
+% Auxiliary
+\pgfkeys{
+	/edge/.is family, /edge,
+	defaultEdge/.style = {
+		curvedValue = no,
+		out = 0,
+		in = 0
+	},
+	curvedValue/.estore in = \edgeCurvedValue,
+	out/.estore in = \edgeOut,
+	in/.estore in = \edgeIn,
+	curved/.code = {\def\edgeCurvedValue{yes}},
+	.unknown/.code={
+		\let\currname\pgfkeyscurrentname
+		\let\currval\pgfkeyscurrentvalue
+		\ifx#1\pgfkeysnovalue
+			\pgfqkeys{/edge}{remainingkeys/.append style/.expand once={\currname}}
+		\else
+			\pgfqkeys{/edge}{remainingkeys/.append style/.expand twice={\expandafter\currname\expandafter=\currval}}
+		\fi
+	}
+}
+
 %---------------------------------------------------------------------------------------------------
 % Vertices
 
@@ -62,7 +86,7 @@
 % \vertex[optional arguments (color, size, etc.)]{x}{y}{name}
 \newcommand{\vertex}[4][]{
 	\pgfqkeys{/vertex}{remainingkeys/.style={}}
-	\pgfkeys{/vertex, default, #1}
+	\pgfkeys{/vertex, defaultVertex, #1}
 
 	\IfEqCase{\vertexSize}{
 		{small}{\def\vertexDiameter{0.16cm}}
@@ -89,7 +113,13 @@
 % Straight
 % \edge[optional arguments (such as "color=red, dashed")]{nameVertex1}{nameVertex2}
 \newcommand{\edge}[3][]{
-	\draw[#1] (#2) -- (#3);
+	\pgfqkeys{/edge}{remainingkeys/.style={}}
+	\pgfkeys{/edge, defaultEdge, #1}
+
+	\IfEqCase{\edgeCurvedValue}{
+		{yes}{\draw[/edge/remainingkeys] (#2) to[out=\edgeOut, in=\edgeIn] (#3);}
+		{no}{\draw[/edge/remainingkeys] (#2) -- (#3);}%
+	}[]
 }
 
 %----------------------------------
@@ -134,7 +164,7 @@
 % Cycle
 % \cycle[optional arguments]{x of center}{y of center}{scale}{n}{name}
 \newcommand{\cycle}[6][]{
-	\pgfkeys{/vertex, default, #1}
+	\pgfkeys{/vertex, defaultVertex, #1}
 
 	\foreach \cycleI in {1,...,#5} {
 		\vertexRegularPolygon[#1]
@@ -158,10 +188,43 @@
 %---------------------------------------------------------------------------------------------------
 
 %---------------------------------------------------------------------------------------------------
+% Anti-hole
+% \antihole[optional arguments]{x of center}{y of center}{scale}{n}{name}
+\newcommand{\antihole}[6][]{
+	\pgfkeys{/vertex, defaultVertex, #1}
+
+	\foreach \antiholeI in {1, ..., #5} {
+		\vertexRegularPolygon[#1]
+						{#2}{#3}
+						{#4}
+						{#5}
+						{\antiholeI}
+						{#6\antiholeI};
+	}
+
+	\pgfmathtruncatemacro{\antiholeN}{#5};
+	\pgfmathtruncatemacro{\antiholeNminusOne}{\antiholeN - 1};
+	\pgfmathtruncatemacro{\antiholeNminusTwo}{\antiholeN - 2};
+
+	\foreach \antiholeI in {3, ..., \antiholeNminusOne} {
+		\pgfmathtruncatemacro{\antiholeIminusTwo}{\antiholeI - 2};
+
+		\foreach \antiholeJ in {1, ..., \antiholeIminusTwo} {
+			\edge[\vertexColor]{#6\antiholeI}{#6\antiholeJ};
+		}
+	}
+
+	\foreach \antiholeI in {2, ..., \antiholeNminusTwo} {
+		\edge[\vertexColor]{#6\antiholeN}{#6\antiholeI};
+	}
+}
+%---------------------------------------------------------------------------------------------------
+
+%---------------------------------------------------------------------------------------------------
 % Complete
 % \complete[optional arguments]{x of center}{y of center}{scale}{n}{name}
 \newcommand{\complete}[6][]{
-	\pgfkeys{/vertex, default, #1}
+	\pgfkeys{/vertex, defaultVertex, #1}
 
 	\foreach \completeI in {1,...,#5} {
 		\vertexRegularPolygon[#1]
@@ -190,7 +253,7 @@
 % Thin spider
 % \thinSpider[optional arguments]{x of center}{y of center}{scale}{n}{name}
 \newcommand{\thinSpider}[6][]{
-	\pgfkeys{/vertex, default, #1}
+	\pgfkeys{/vertex, defaultVertex, #1}
 
 	\foreach \thinSpiderI in {1,...,#5} {
 		\vertexRegularPolygon[#1]
@@ -225,7 +288,7 @@
 % Thick spider
 % \thickSpider[optional arguments]{x of center}{y of center}{scale}{n}{name}
 \newcommand{\thickSpider}[6][]{
-	\pgfkeys{/vertex, default, #1}
+	\pgfkeys{/vertex, defaultVertex, #1}
 
 	\foreach \thickSpiderI in {1,...,#5} {
 		\vertexRegularPolygon[#1]
